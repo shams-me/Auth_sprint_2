@@ -1,0 +1,35 @@
+version: "3.7"
+name: async-api-test
+
+services:
+  auth-api:
+    build: auth-service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.example
+
+  postgres:
+    image: postgres:13
+    volumes:
+      - ./volumes/test_postgres:/var/lib/postgresql/data
+      - ./schema_design/scripts:/docker-entrypoint-initdb.d
+    env_file:
+      - .env.example
+    expose:
+      - "5432"
+    restart: unless-stopped
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  functional-tests:
+    build: tests
+    env_file:
+      - .env.example
+    depends_on:
+      - auth-api

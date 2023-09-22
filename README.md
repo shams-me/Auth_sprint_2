@@ -1,23 +1,96 @@
-# Проектная работа 7 спринта
+# Async API for Auth Service
 
-1. Создайте интеграцию Auth-сервиса с сервисом выдачи контента и панелью администратора Django, используя контракт, который вы сделали в прошлом задании.
-  
-    При создании интеграции не забудьте учесть изящную деградацию Auth-сервиса. Как вы уже выяснили ранее, Auth сервис один из самых нагруженных, потому что в него ходят большинство сервисов сайта. И если он откажет, сайт отказать не должен. Обязательно учтите этот сценарий в интеграциях с Auth-сервисом.
-2. Добавьте в Auth трасировку и подключите к Jaeger. Для этого вам нужно добавить работу с заголовком x-request-id и отправку трасировок в Jaeger.
-3. Добавьте в сервис механизм ограничения количества запросов к серверу.
-4. Упростите регистрацию и аутентификацию пользователей в Auth-сервисе, добавив вход через социальные сервисы. Список сервисов выбирайте исходя из целевой аудитории онлайн-кинотеатра — подумайте, какими социальными сервисами они пользуются. Например, использовать [OAuth от Github](https://docs.github.com/en/free-pro-team@latest/developers/apps/authorizing-oauth-apps){target="_blank"} — не самая удачная идея. Ваши пользователи не разработчики и вряд ли имеют аккаунт на Github. А вот добавить VK, Google, Yandex или Mail будет хорошей идеей.
+Asynchronous Auth API is designed to provide a simple and easy-to-use API for user authentication and authorization.
 
-    Вам не нужно делать фронтенд в этой задаче и реализовывать собственный сервер OAuth. Нужно реализовать протокол со стороны потребителя.
-    
-    Информация по OAuth у разных поставщиков данных: 
-    
-    - [Yandex](https://yandex.ru/dev/oauth/?turbo=true){target="_blank"},
-    - [VK](https://vk.com/dev/access_token){target="_blank"},
-    - [Google](https://developers.google.com/identity/protocols/oauth2){target="_blank"},
-    - [Mail](https://api.mail.ru/docs/guides/oauth/){target="_blank"}.
-    
-## Дополнительное задание
-    
-Реализуйте возможность открепить аккаунт в соцсети от личного кабинета. 
-    
-Решение залейте в репозиторий текущего спринта и отправьте на ревью.
+### Technologies Used
+
+- **Language**: Python + FastAPI
+- **Server**: ASGI server (uvicorn)
+- **Storage**: ElasticSearch
+- **Caching**: Redis Cluster
+- **Containerization**: Docker
+
+## Installation and Usage
+
+Follow these steps to install and run the project:
+
+1. Clone the repository:
+
+```shell
+git clone https://github.com/chingisdev/Auth_sprint_1.git
+```
+
+</br>
+
+2. Set up the environment variables in an .env file in the root of the project:
+
+| Variable                       | Explanation                  | Example               |
+|--------------------------------|------------------------------|-----------------------|
+| `POSTGRES_HOST`                | PostgreSQL Hostname          | `postgres_test`       |
+| `POSTGRES_PASSWORD`            | PostgreSQL Password          | `123qwe`              |
+| `POSTGRES_USER`                | PostgreSQL User              | `app`                 |
+| `POSTGRES_DB`                  | PostgreSQL Database Name     | `movies_database`     |
+| `POSTGRES_PORT`                | PostgreSQL Port              | `5432`                |
+| `REDIS_HOST`                   | Redis Hostname               | `redis_test`          |
+| `REDIS_PORT`                   | Redis Port                   | `6379`                |
+| `JWT_SECRET`                   | Secret key to generate token | `some_mega_hard_pass` |
+| `SERVICE_HOST`                 | Service Host                 | `localhost`           |
+| `SERVICE_PORT`                 | Service Port                 | `8000`                |
+| `CACHE_EXPIRE_TIME_IN_SECONDS` | Cache expire time            | `600`                 |
+
+</br>
+
+3. make sure that every service in `docker-compose.yml` pointing to your env file:
+
+```yaml
+    env_file:
+      - <your_path/.env>
+```
+
+4. Start the services:
+
+```shell
+docker-compose up
+```
+
+This command will:
+
+- Start the containers
+- Initialize the PostgreSQL database
+- Initialize the Redis database
+- Creates superuser with roles
+- Start the auth API service
+
+## Features
+
+You can explore all the API endpoints through Swagger's interactive documentation. Once you have launched the
+application, simply copy and paste the following URL into your browser's address bar:
+
+`http://localhost:8000/api/openapi`
+
+This will provide you with detailed information about each endpoint, allowing you to understand and interact with the
+API more effectively.
+
+## Contribution Guidelines
+
+When contributing to this project, please follow these naming conventions for branches:
+
+- **Valid Branch Actions (as action):** Use `feat` for features or `fix` for bug fixes.
+- **Goal Action (as goal):** The goal must start with a verb and describe the branch's purpose.
+
+### Valid Branch Name Example
+
+Format: `issue_number/action-goal`
+
+Example: `15/feat-add-sort-query-results`
+
+## Setup Development Environment
+
+1. You can prepare your local environment with this:
+
+```shell
+python -m venv venv &&
+. venv/bin/activate &&
+pip install -r requirements.txt &&
+pre-commit install
+```
