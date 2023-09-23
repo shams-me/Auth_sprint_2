@@ -11,8 +11,9 @@ app = FastAPI(
     title=f"Read-only API for {settings.project_name}.",
     description="Information about Authorisation and Roles.",
     version="1.0.0",
-    docs_url="/api/openapi",
-    openapi_url="/api/openapi.json",
+    docs_url='/api/openapi',
+    openapi_url='/api/openapi.json',
+    # root_path="/auth",
     default_response_class=ORJSONResponse,
 )
 
@@ -37,3 +38,10 @@ async def shutdown():
 app.include_router(auth.router, prefix="/api/v1/auth")
 app.include_router(role.router, prefix="/api/v1/roles")
 app.include_router(user_role.router, prefix="/api/v1/user_roles")
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="localhost", port=8080)
+

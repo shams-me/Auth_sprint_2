@@ -2,10 +2,11 @@ from functools import lru_cache
 from uuid import UUID
 
 from fastapi import Depends
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.postgres import get_postgres_session
-from models.role import UserRoles
+from models.entity import User
 
 
 class UserRoleService:
@@ -21,8 +22,8 @@ class UserRoleService:
         :return: None
         """
 
-        instance = UserRoles(user_id=user_id, role_id=role_id)
-        self.session.add(instance)
+        stmt = update(User).where(user_id=user_id).values(role_id=role_id)
+        await self.session.execute(stmt)
         await self.session.commit()
 
 

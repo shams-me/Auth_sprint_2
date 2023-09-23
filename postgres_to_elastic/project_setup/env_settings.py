@@ -1,22 +1,23 @@
 import logging
 
+from pydantic import Field
 from pydantic_settings import BaseSettings
 
 logging.basicConfig(level=logging.INFO)
 
 
 class Settings(BaseSettings):
-    postgres_host: str
-    postgres_port: int
-    postgres_password: str
-    postgres_db: str
-    postgres_user: str
-    redis_host: str
-    redis_port: int
-    elastic_host: str
-    elastic_port: int
-    elastic_scheme: str
-    repeat_time_seconds: int
+    postgres_host: str = Field(default="127.0.0.1", env="POSTGRES_HOST")
+    postgres_port: int = Field(default=5432, env="POSTGRES_PORT")
+    postgres_user: str = Field(default="auth", env="POSTGRES_USER")
+    postgres_password: str = Field(default="123qwe", env="POSTGRES_PASSWORD")
+    postgres_db: str = Field(default="auth_database", env="POSTGRES_DB")
+    redis_host: str = Field(default="127.0.0.1", env="REDIS_HOST")
+    redis_port: int = Field(default=6379, env="REDIS_PORT")
+    elastic_host: str = Field(default="elasticsearch", env="ELASTIC_HOST")
+    elastic_port: int = Field(default=9200, env="ELASTIC_PORT")
+    elastic_scheme: str = Field(default="http", env="ELASTIC_SCHEME")
+    repeat_time_seconds: int = Field(default=60, env="REPEAT_TIME_SECONDS")
 
     @property
     def elastic_url(self):

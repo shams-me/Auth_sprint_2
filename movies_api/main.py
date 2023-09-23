@@ -13,6 +13,7 @@ app = FastAPI(
     docs_url="/api/openapi",
     openapi_url="/api/openapi.json",
     default_response_class=ORJSONResponse,
+    # root_path="/movies"
 )
 
 
@@ -44,3 +45,10 @@ app.include_router(
     persons.router,
     prefix="/api/v1/persons",
 )
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="localhost", port=8000)
+

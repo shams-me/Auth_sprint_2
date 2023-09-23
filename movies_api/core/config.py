@@ -11,6 +11,8 @@ logging_config.dictConfig(LOGGING)
 class Settings(BaseSettings):
     project_name: str = Field("movies", env="PROJECT_NAME")
 
+    auth_url_me: str = Field("http://localhost:8080/api/v1/auth/me", env="AUTH_URL_ME")
+
     cache_expire_time: int = Field(300, env="CACHE_EXPIRE_TIME_IN_SECONDS")
 
     redis_host: str = Field("127.0.0.1", env="REDIS_PORT")

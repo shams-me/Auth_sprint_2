@@ -44,6 +44,7 @@ class VerificationTOTP(BaseModel):
 class UserInfo(BaseModel):
     username: str
     email: EmailStr
+    role: str
 
 
 class UserUpdate(BaseModel):

@@ -30,7 +30,7 @@ def token_persistence_validation(authorization: str = Header(...)):
     response_model=UserInfo
 )
 async def get_current_user_route(user=Depends(get_current_user)):
-    return user
+    return UserInfo(username=user.username, email=user.email, role=user.role.name)
 
 
 @router.post(

@@ -6,7 +6,6 @@ from sqlalchemy import (
     UUID,
     String,
     ForeignKey,
-    UniqueConstraint,
     Enum,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -29,29 +28,6 @@ class PermissionEnum(enum.Enum):
     DELETE = "delete"
 
 
-class UserRoles(Base):
-    """
-    This class represents the relationship between a User and a Role.
-    Attributes:
-        id (Mapped[UUID]): The unique identifier of the user-role relationship.
-        user_id (Mapped[UUID]): The unique identifier of the user.
-        role_id (Mapped[UUID]): The unique identifier of the role.
-
-    Methods:
-        __repr__(): Returns a string representation of the UserRoles object.
-    """
-    __tablename__ = 'user_roles'
-
-    id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
-    role_id: Mapped[UUID] = mapped_column(ForeignKey("roles.id", ondelete="CASCADE"))
-
-    def __repr__(self):
-        return f"<UserRoles {self.id}>"
-
-    __table_args__ = (UniqueConstraint('user_id', 'role_id', name='user_role_index'), )
-
-
 class Role(Base, TimestampMixin):
     """
     This class represents a Role in the application.
@@ -68,7 +44,7 @@ class Role(Base, TimestampMixin):
     __tablename__ = "roles"
 
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name: Mapped[Optional[str]] = mapped_column(String(1024), Enum(RoleEnum))
+    name: Mapped[Optional[str]] = mapped_column(String(1024), Enum(RoleEnum), unique=True)
     permissions: Mapped[list["Permission"]] = relationship(
         "Permission", secondary="role_permissions", uselist=True, lazy="selectin"
     )

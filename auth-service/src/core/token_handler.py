@@ -2,9 +2,8 @@ from abc import ABC, abstractmethod
 from datetime import datetime, timedelta, timezone
 from enum import Enum
 
-from fastapi import HTTPException, status
-
 from core.token_encoder import ITokenEncoder
+from fastapi import HTTPException, status
 from models.entity import User
 
 
@@ -52,7 +51,8 @@ class ITokenHandler(ABC):
 class JWTHandler(ITokenHandler):
 
     def get_access_refresh_pair(self, user: User) -> tuple[str, str]:
-        access_token = self.encode({'user_id': str(user.id), 'email': user.email}, TokenMinutesLifetime.ACCESS)
+        access_token = self.encode({'user_id': str(user.id), 'role': user.role.name, 'email': user.email},
+                                   TokenMinutesLifetime.ACCESS)
         refresh_token = self.encode({'user_id': str(user.id)}, TokenMinutesLifetime.REFRESH)
         return access_token, refresh_token
 

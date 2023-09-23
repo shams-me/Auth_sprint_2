@@ -23,9 +23,9 @@ class Settings(BaseSettings):
 
     postgres_host: str = Field(default="127.0.0.1", env="POSTGRES_HOST")
     postgres_port: int = Field(default=5432, env="POSTGRES_PORT")
-    postgres_user: str = Field(default="auth", env="POSTGRES_USER")
-    postgres_password: str = Field(default="123qwe", env="POSTGRES_PASSWORD")
-    postgres_db: str = Field(default="auth_database", env="POSTGRES_DB")
+    postgres_user: str = Field(default="postgres", env="POSTGRES_USER")
+    postgres_password: str = Field(default="1", env="POSTGRES_PASSWORD")
+    postgres_db: str = Field(default="test", env="POSTGRES_DB")
 
     super_user_pass: str = Field("some_mega_hard_pass", env="SUPER_USER_PASS")
     super_user_mail: str = Field("superuser@god.com", env="SUPER_USER_MAIL")

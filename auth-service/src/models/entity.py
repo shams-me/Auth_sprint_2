@@ -20,7 +20,7 @@ class User(Base):
     has_2fa = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     role_id = Column(UUID(as_uuid=True), ForeignKey('roles.id'), nullable=True)
-    role = relationship('Role', secondary='user_roles', uselist=False, lazy='selectin')
+    role = relationship('Role', uselist=False, lazy='selectin')
     refresh_token = relationship('RefreshToken', uselist=False, back_populates='user', cascade='delete, delete-orphan')
     devices = relationship('Device', back_populates='user', cascade='all, delete-orphan')
 

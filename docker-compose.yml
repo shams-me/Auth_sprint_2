@@ -11,9 +11,11 @@ services:
       - ./nginx/site.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - auth-api
+      - movies-api
 
   auth-api:
     build: auth-service
+    container_name: auth-api
     restart: unless-stopped
     expose:
       - "8000"
@@ -22,12 +24,11 @@ services:
 
   movies-api:
     build: movies_api
+    container_name: movies-api
     restart: unless-stopped
     depends_on:
       - elasticsearch
       - redis
-    ports:
-      - "8000:8000"
     expose:
       - "8000"
     env_file:
@@ -35,6 +36,7 @@ services:
 
   etl-service:
     build: postgres_to_elastic
+    container_name: postgres_to_elastic
     restart: unless-stopped
     depends_on:
       - postgres
@@ -46,6 +48,7 @@ services:
 
   sqlite-to-postgres:
     build: sqlite_to_postgres
+    container_name: sqlite-to-postgres
     restart: unless-stopped
     depends_on:
       - postgres
@@ -57,7 +60,9 @@ services:
   postgres:
     image: postgres:13
     volumes:
+      - ./init_postgres.sh:/docker-custom-entrypoint/init.sh
       - ./volumes/postgres:/var/lib/postgresql/data
+      - ./schema_design/scripts:/docker-entrypoint-initdb.d
     env_file:
       - .env.example
     expose:
@@ -77,13 +82,9 @@ services:
       - network.host=0.0.0.0
       - xpack.security.enabled=false
     volumes:
-      - ./volumes/elastic:/usr/share/elasticsearch/data
+      - ./elastic_volume:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
     expose:
       - "9200"
     restart: unless-stopped
-    healthcheck:
-      test: [ "CMD-SHELL", "curl --fail http://localhost:9200/_cluster/health || exit 1" ]
-      interval: 10s
-      retries: 5
