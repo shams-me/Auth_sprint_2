@@ -3,17 +3,28 @@ from http import HTTPStatus
 
 import pytest
 
-from tests.functional.test_data.generate_user import generate_user_registration_body, generate_user_login_body
-from tests.functional.utils.endpoints import REGISTER_ENDPOINT, LOGIN_ENDPOINT, LOGOUT_ENDPOINT, REFRESH_ENDPOINT, \
-    LOGIN_HISTORY_ENDPOINT, USER_UPDATE_ENDPOINT
-from tests.functional.utils.user_fields import INITIAL_USER_EMAIL, DEFAULT_USER_PASSWORD
+from tests.functional.test_data.generate_user import (
+    generate_user_login_body,
+    generate_user_registration_body,
+)
+from tests.functional.utils.endpoints import (
+    LOGIN_ENDPOINT,
+    LOGIN_HISTORY_ENDPOINT,
+    LOGOUT_ENDPOINT,
+    REFRESH_ENDPOINT,
+    REGISTER_ENDPOINT,
+    USER_UPDATE_ENDPOINT,
+)
+from tests.functional.utils.user_fields import DEFAULT_USER_PASSWORD, INITIAL_USER_EMAIL
 
 
 @pytest.mark.parametrize(
     "email, expected_status",
-    [(INITIAL_USER_EMAIL, [HTTPStatus.CONFLICT, HTTPStatus.OK]),
-     ("new_user_email1@example.com", [HTTPStatus.CONFLICT, HTTPStatus.OK]),
-     (INITIAL_USER_EMAIL, [HTTPStatus.CONFLICT])],
+    [
+        (INITIAL_USER_EMAIL, [HTTPStatus.CONFLICT, HTTPStatus.OK]),
+        ("new_user_email1@example.com", [HTTPStatus.CONFLICT, HTTPStatus.OK]),
+        (INITIAL_USER_EMAIL, [HTTPStatus.CONFLICT]),
+    ],
 )
 async def test_register_new_user(make_post_request, email, expected_status):
     new_user_data = generate_user_registration_body(email)
@@ -30,7 +41,11 @@ async def test_register_new_user_empty_body_error(make_post_request):
 
 
 @pytest.mark.parametrize(
-    "email, expected_status", [(INITIAL_USER_EMAIL, HTTPStatus.OK), ("random_user@example.com", HTTPStatus.BAD_REQUEST)]
+    "email, expected_status",
+    [
+        (INITIAL_USER_EMAIL, HTTPStatus.OK),
+        ("random_user@example.com", HTTPStatus.BAD_REQUEST),
+    ],
 )
 async def test_login_successful(make_post_request, email, expected_status):
     login_data = generate_user_login_body(email)
@@ -82,39 +97,52 @@ async def test_login_history_token_expired(make_get_request, expired_access_jwt_
 @pytest.mark.parametrize(
     "user_data, expected_status",
     [
-        ({
-            "username": "new_username", "old_password": "", "new_password": "", "new_password_confirmation": ""
-        },
-         HTTPStatus.OK),  # noqa: E121
-        ({
-            "username": "",
-            "old_password": DEFAULT_USER_PASSWORD,
-            "new_password": "new_password",
-            "new_password_confirmation": "new_password"
-        },
-         HTTPStatus.OK),  # noqa: E121
-        ({
-            "username": "updated_username",
-            "old_password": DEFAULT_USER_PASSWORD,
-            "new_password": "new_password",
-            "new_password_confirmation": "new_password"
-        },
-         HTTPStatus.OK),  # noqa: E121
-        ({
-            "username": "",
-            "old_password": DEFAULT_USER_PASSWORD,
-            "new_password": "new_pass",
-            "new_password_confirmation": "new_password"
-        },
-         HTTPStatus.UNPROCESSABLE_ENTITY),  # noqa: E121
-        ({
-            "username": "",
-            "old_password": "string",
-            "new_password": "new_pass",
-            "new_password_confirmation": "new_pass"
-        },
-         HTTPStatus.BAD_REQUEST)  # noqa: E121
-    ]
+        (
+            {
+                "username": "new_username",
+                "old_password": "",
+                "new_password": "",
+                "new_password_confirmation": "",
+            },
+            HTTPStatus.OK,
+        ),  # noqa: E121
+        (
+            {
+                "username": "",
+                "old_password": DEFAULT_USER_PASSWORD,
+                "new_password": "new_password",
+                "new_password_confirmation": "new_password",
+            },
+            HTTPStatus.OK,
+        ),  # noqa: E121
+        (
+            {
+                "username": "updated_username",
+                "old_password": DEFAULT_USER_PASSWORD,
+                "new_password": "new_password",
+                "new_password_confirmation": "new_password",
+            },
+            HTTPStatus.OK,
+        ),  # noqa: E121
+        (
+            {
+                "username": "",
+                "old_password": DEFAULT_USER_PASSWORD,
+                "new_password": "new_pass",
+                "new_password_confirmation": "new_password",
+            },
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        ),  # noqa: E121
+        (
+            {
+                "username": "",
+                "old_password": "string",
+                "new_password": "new_pass",
+                "new_password_confirmation": "new_pass",
+            },
+            HTTPStatus.BAD_REQUEST,
+        ),  # noqa: E121
+    ],
 )
 async def test_update_user_successful(make_patch_request, fresh_jwt, user_data, expected_status):
     access_token, refresh_token = fresh_jwt
@@ -127,7 +155,7 @@ async def test_update_user_token_invalid(make_patch_request, invalid_access_jwt_
         "username": "updated_username",
         "old_password": DEFAULT_USER_PASSWORD,
         "new_password": "new_password",
-        "new_password_confirmation": "new_password"
+        "new_password_confirmation": "new_password",
     }
     status, body = await make_patch_request(USER_UPDATE_ENDPOINT, json_data, jwt_token=invalid_access_jwt_token)
     assert status == HTTPStatus.BAD_REQUEST
@@ -138,7 +166,7 @@ async def test_update_user_token_expired(make_patch_request, expired_access_jwt_
         "username": "updated_username",
         "old_password": DEFAULT_USER_PASSWORD,
         "new_password": "new_password",
-        "new_password_confirmation": "new_password"
+        "new_password_confirmation": "new_password",
     }
     status, body = await make_patch_request(USER_UPDATE_ENDPOINT, json_data, jwt_token=expired_access_jwt_token)
     assert status == HTTPStatus.BAD_REQUEST

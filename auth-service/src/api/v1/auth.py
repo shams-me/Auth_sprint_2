@@ -1,13 +1,22 @@
+from http import HTTPStatus
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Header, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
-
 from dependencies.current_user import get_current_user
+from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
+from fastapi.security import OAuth2PasswordRequestForm
 from schemas.entity import (
-    SuccessfulLogout, UserLogin, UserRegistration, SuccessfulAuth, UserLoginHistory, UserUpdate, UserInfo
+    SuccessfulAuth,
+    SuccessfulLogout,
+    UserInfo,
+    UserLogin,
+    UserLoginHistory,
+    UserRegistration,
+    UserUpdate,
 )
-from services.auth import get_auth_service, AbstractAuthService
+from services.auth import AbstractAuthService, AuthServiceImpl, get_auth_service
+from services.login.base import OAuthLogin
+from services.login.yandex import YandexProvider, yandex_provider
+from starlette.responses import RedirectResponse
 
 router = APIRouter()
 
@@ -27,7 +36,7 @@ def token_persistence_validation(authorization: str = Header(...)):
     summary="Get current user information.",
     description="Must provide Bearear header",
     tags=["Auth"],
-    response_model=UserInfo
+    response_model=UserInfo,
 )
 async def get_current_user_route(user=Depends(get_current_user)):
     return UserInfo(username=user.username, email=user.email, role=user.role.name)
@@ -38,23 +47,29 @@ async def get_current_user_route(user=Depends(get_current_user)):
     summary="User Registration method.",
     description="Must provide all required fields. Automatically login if success.",
     tags=["Auth"],
-    response_model=SuccessfulAuth
+    response_model=SuccessfulAuth,
 )
 async def register_user(body: UserRegistration, auth_service=Depends(get_auth_service)) -> SuccessfulAuth:
     response = await auth_service.register(body)
     if not response:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='email and username must be unique.')
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="email and username must be unique.",
+        )
     return response
 
 
 @router.post("/token", summary="Get user token.", tags=["Auth"], response_model=SuccessfulAuth)
 async def token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    auth_service: AbstractAuthService = Depends(get_auth_service)
+    auth_service: AbstractAuthService = Depends(get_auth_service),
 ) -> SuccessfulAuth:
     response = await auth_service.login_by_credentials(email=form_data.username, password=form_data.password)
     if not response:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Provided data was incorrect, try again.')
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Provided data was incorrect, try again.",
+        )
     return response
 
 
@@ -63,13 +78,50 @@ async def token(
     summary="User Login method.",
     description="Must provide all required fields.",
     tags=["Auth"],
-    response_model=SuccessfulAuth
+    response_model=SuccessfulAuth,
 )
 async def login_user(body: UserLogin, auth_service=Depends(get_auth_service)) -> SuccessfulAuth:
     response = await auth_service.login(body)
     if not response:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Provided data was incorrect, try again.')
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Provided data was incorrect, try again.",
+        )
     return response
+
+
+@router.post(
+    "/login/{provider}",
+    response_class=RedirectResponse,
+    status_code=HTTPStatus.SEE_OTHER,
+    summary="Login using providers",
+    tags=["Auth"],
+)
+async def provider_login(
+    provider: str,
+):
+    provider = OAuthLogin.get_provider(provider)
+    if provider:
+        return provider.get_auth_url()
+    raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Provider was not found")
+
+
+@router.get(
+    "/login/yandex/redirect",
+    response_model=SuccessfulAuth,
+    status_code=HTTPStatus.ACCEPTED,
+    summary="Login with yandex oauth2.0",
+    tags=["Auth"],
+)
+async def yandex_login_redirect(
+    code: str,
+    request: Request,
+    ya_provider: YandexProvider = Depends(yandex_provider),
+    auth_service: AuthServiceImpl = Depends(get_auth_service),
+):
+    user_agent = request.headers.get("User-Agent")
+    login_result = await auth_service.login_by_yandex(code=code, provider=ya_provider, user_agent=user_agent)
+    return login_result
 
 
 @router.post(
@@ -77,15 +129,18 @@ async def login_user(body: UserLogin, auth_service=Depends(get_auth_service)) ->
     summary="User Logout method.",
     description="Must provide Bearear header",
     tags=["Auth"],
-    response_model=SuccessfulLogout
+    response_model=SuccessfulLogout,
 )
 async def logout_user(
     access_token: str = Depends(token_persistence_validation),
-    auth_service: AbstractAuthService = Depends(get_auth_service)
+    auth_service: AbstractAuthService = Depends(get_auth_service),
 ):
     response = await auth_service.logout(access_token)
     if not response:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Invalid access token, try again.')
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid access token, try again.",
+        )
     return {"detail": "Successfully logged out."}
 
 
@@ -98,11 +153,14 @@ async def logout_user(
 )
 async def refresh_tokens(
     refresh_token: str = Depends(token_persistence_validation),
-    auth_service: AbstractAuthService = Depends(get_auth_service)
+    auth_service: AbstractAuthService = Depends(get_auth_service),
 ) -> SuccessfulAuth:
     response = await auth_service.refresh(refresh_token)
     if not response:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid or expired refresh token.")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid or expired refresh token.",
+        )
     return response
 
 
@@ -111,10 +169,11 @@ async def refresh_tokens(
     summary="Get login history.",
     description="Shows last login time of unique by fingerprint devices.",
     tags=["Auth"],
-    response_model=UserLoginHistory
+    response_model=UserLoginHistory,
 )
 async def get_login_history(
-    access_token: str = Depends(token_persistence_validation), auth_service=Depends(get_auth_service)
+    access_token: str = Depends(token_persistence_validation),
+    auth_service=Depends(get_auth_service),
 ):
     response = await auth_service.get_login_history(access_token)
     if not response:
@@ -131,7 +190,7 @@ async def get_login_history(
 async def update_user_information(
     user_update: UserUpdate,
     access_token: str = Depends(token_persistence_validation),
-    auth_service=Depends(get_auth_service)
+    auth_service=Depends(get_auth_service),
 ):
     await auth_service.update_user(access_token, user_update)
     return {"detail": "User information updated successfully"}

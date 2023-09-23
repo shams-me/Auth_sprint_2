@@ -2,12 +2,7 @@ import enum
 import uuid
 from typing import Optional
 
-from sqlalchemy import (
-    UUID,
-    String,
-    ForeignKey,
-    Enum,
-)
+from sqlalchemy import UUID, Enum, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base, TimestampMixin
@@ -65,6 +60,7 @@ class Permission(Base, TimestampMixin):
         __repr__(): Returns a string representation of the Role object.
 
     """
+
     __tablename__ = "permissions"
 
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -87,6 +83,7 @@ class RolePermission(Base, TimestampMixin):
         __repr__(): Returns a string representation of the RolePermission object.
 
     """
+
     __tablename__ = "role_permissions"
 
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

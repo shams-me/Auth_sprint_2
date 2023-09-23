@@ -21,7 +21,8 @@ router = APIRouter()
 async def film_details_list(
     search: str = Query(None, description="Searching text"),
     sort: MoviesSortOptions = Query(
-        None, description='Sort order (Use "imdb_rating" for ascending or "-imdb_rating" for descending)'
+        None,
+        description='Sort order (Use "imdb_rating" for ascending or "-imdb_rating" for descending)',
     ),
     page_size: int = Query(50, ge=1, le=100, description="Number of films per page"),
     page_number: int = Query(1, ge=1, description="Page number"),
@@ -37,7 +38,10 @@ async def film_details_list(
 
 
 @router.get(
-    "/{film_id}", description="Returns information about movie according uuid.", tags=["Movies"], response_model=Film
+    "/{film_id}",
+    description="Returns information about movie according uuid.",
+    tags=["Movies"],
+    response_model=Film,
 )
 async def film_details(film_id: str, model_service: ModelServiceProtocol[Film] = Depends(get_film_service)) -> Film:
     film = await model_service.get_by_id(film_id)

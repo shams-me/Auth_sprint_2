@@ -1,12 +1,11 @@
 from functools import lru_cache
 from uuid import UUID
 
+from db.postgres import get_postgres_session
 from fastapi import Depends
+from models.entity import User
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from db.postgres import get_postgres_session
-from models.entity import User
 
 
 class UserRoleService:
@@ -28,5 +27,7 @@ class UserRoleService:
 
 
 @lru_cache()
-def get_user_role_service(session: AsyncSession = Depends(get_postgres_session)) -> UserRoleService:
+def get_user_role_service(
+    session: AsyncSession = Depends(get_postgres_session),
+) -> UserRoleService:
     return UserRoleService(session=session)

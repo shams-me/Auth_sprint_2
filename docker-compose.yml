@@ -34,6 +34,14 @@ services:
     env_file:
       - .env.example
 
+  django:
+    container_name: django
+    env_file: "etc/environs/django.env"
+    build: django_api
+    restart: on-failure
+    volumes:
+      - ./django_api/static:/opt/app/static:ro
+
   etl-service:
     build: postgres_to_elastic
     container_name: postgres_to_elastic

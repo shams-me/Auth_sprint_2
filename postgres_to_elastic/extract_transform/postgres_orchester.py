@@ -10,7 +10,12 @@ class PostgresOrchester:
     def __init__(self, extractors: List[PostgresReceiver]):
         self.extractors = extractors
 
-    def extract_transformed_data(self, index: ElasticIndexName, table_names: List[str], boundaries: DateBoundaries):
+    def extract_transformed_data(
+        self,
+        index: ElasticIndexName,
+        table_names: List[str],
+        boundaries: DateBoundaries,
+    ):
         try:
             target_extractor = None
             for extractor in self.extractors:

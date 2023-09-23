@@ -39,7 +39,8 @@ async def genre_details_list(
     response_model=Genre,
 )
 async def genre_details(
-    genre_id: str, model_service: ModelServiceProtocol[Genre] = Depends(get_genre_service)
+    genre_id: str,
+    model_service: ModelServiceProtocol[Genre] = Depends(get_genre_service),
 ) -> Genre:
     genre = await model_service.get_by_id(genre_id)
     if not genre:

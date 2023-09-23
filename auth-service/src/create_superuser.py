@@ -3,12 +3,11 @@ import logging
 import uuid
 from logging import config as logging_config
 
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from sqlalchemy.future import select
-
 from core.logger import LOGGING
 from models.entity import User
 from models.role import Role, RoleEnum, UserRoles
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.future import select
 
 logging_config.dictConfig(LOGGING)
 
@@ -52,7 +51,11 @@ async def get_or_create_superuser(session: AsyncSession, role_id: uuid.UUID):
     superuser = await get_user_by_email(session, settings.super_user_mail)
     if not superuser:
         superuser = await create_superuser(
-            session, settings.super_user_mail, settings.super_user_pass, 'superuser', role_id
+            session,
+            settings.super_user_mail,
+            settings.super_user_pass,
+            "superuser",
+            role_id,
         )
         logging.info("Successfully created Super User")
     else:

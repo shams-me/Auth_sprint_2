@@ -8,7 +8,6 @@ from tests.functional.settings import test_settings
 
 @pytest.fixture
 def make_get_request(aiohttp_client: aiohttp.ClientSession):
-
     async def _inner(endpoint: str, params: dict = None, jwt_token: str = None):
         url = test_settings.service_url + endpoint
 
@@ -31,15 +30,19 @@ def make_get_request(aiohttp_client: aiohttp.ClientSession):
 
 @pytest.fixture
 def make_post_request(aiohttp_client: aiohttp.ClientSession):
-
-    async def _inner(endpoint: str, json_data: dict = None, params: dict = None, jwt_token: str = None):
+    async def _inner(
+        endpoint: str,
+        json_data: dict = None,
+        params: dict = None,
+        jwt_token: str = None,
+    ):
         url = test_settings.service_url + endpoint
 
         if params:
             encoded_params = urllib.parse.urlencode(params, quote_via=urllib.parse.quote)
             url = f"{url}?{encoded_params}"
 
-        headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
+        headers = {"accept": "application/json", "Content-Type": "application/json"}
         if jwt_token:
             headers["Authorization"] = f"Bearer {jwt_token}"
 
@@ -53,11 +56,10 @@ def make_post_request(aiohttp_client: aiohttp.ClientSession):
 
 @pytest.fixture
 def make_patch_request(aiohttp_client: aiohttp.ClientSession):
-
     async def _inner(endpoint: str, json_data: dict = None, jwt_token: str = None):
         url = test_settings.service_url + endpoint
 
-        headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
+        headers = {"accept": "application/json", "Content-Type": "application/json"}
 
         if jwt_token:
             headers["Authorization"] = f"Bearer {jwt_token}"
@@ -72,11 +74,15 @@ def make_patch_request(aiohttp_client: aiohttp.ClientSession):
 
 @pytest.fixture
 def make_delete_request(aiohttp_client: aiohttp.ClientSession):
-
-    async def _inner(endpoint: str, json_data: dict = None, params: dict = None, jwt_token: str = None):
+    async def _inner(
+        endpoint: str,
+        json_data: dict = None,
+        params: dict = None,
+        jwt_token: str = None,
+    ):
         url = test_settings.service_url + endpoint
 
-        headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
+        headers = {"accept": "application/json", "Content-Type": "application/json"}
 
         if params:
             encoded_params = urllib.parse.urlencode(params, quote_via=urllib.parse.quote)

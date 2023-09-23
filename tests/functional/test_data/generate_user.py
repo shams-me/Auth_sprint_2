@@ -7,8 +7,11 @@ def generate_user_registration_body(email: str):
         "username": DEFAULT_USERNAME,
         "password": DEFAULT_USER_PASSWORD,
         "device_fingerprint": {
-            "user_agent": "MacOS", "screen_width": 720, "screen_height": 720, "timezone": "Asia/Tokyo"
-        }
+            "user_agent": "MacOS",
+            "screen_width": 720,
+            "screen_height": 720,
+            "timezone": "Asia/Tokyo",
+        },
     }
 
 
@@ -17,6 +20,9 @@ def generate_user_login_body(email: str, password: str = DEFAULT_USER_PASSWORD):
         "email": email,
         "password": password,
         "device_fingerprint": {
-            "user_agent": "MacOS", "screen_width": 720, "screen_height": 720, "timezone": "Asia/Tokyo"
-        }
+            "user_agent": "MacOS",
+            "screen_width": 720,
+            "screen_height": 720,
+            "timezone": "Asia/Tokyo",
+        },
     }

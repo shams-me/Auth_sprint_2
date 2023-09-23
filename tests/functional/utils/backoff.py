@@ -17,8 +17,6 @@ def backoff(wait_multiplier=1, wait_min=4, wait_max=10):
                 max=wait_max,
             ),
             before_sleep=before_sleep_log(logger, logging.INFO),
-        )(
-            func
-        )
+        )(func)
 
     return decorator

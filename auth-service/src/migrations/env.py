@@ -2,17 +2,24 @@ import asyncio
 from logging.config import fileConfig
 
 from alembic import context
+from core.config import settings
 from dotenv import load_dotenv
+from models.base import Base
+from models.entity import Device, RefreshToken, SocialAccount, User
+from models.role import Permission, Role, RolePermission
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from core.config import settings
-from models.base import Base
-from models.role import Permission, Role, RolePermission, UserRoles
-from models.entity import User, RefreshToken, Device
-
-__all__ = ['UserRoles', 'Role', 'Permission', 'RolePermission', 'User', 'RefreshToken', 'Device']
+__all__ = [
+    "Role",
+    "Permission",
+    "RolePermission",
+    "User",
+    "RefreshToken",
+    "Device",
+    "SocialAccount",
+]
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

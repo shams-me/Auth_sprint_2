@@ -8,7 +8,10 @@ from tests.functional.utils.endpoints import ROLE_ENDPOINT
 
 @pytest.mark.parametrize(
     "name, expected_status",
-    [(RoleEnum.MODERATOR.value, HTTPStatus.FORBIDDEN), (RoleEnum.USER.value, HTTPStatus.FORBIDDEN)],
+    [
+        (RoleEnum.MODERATOR.value, HTTPStatus.FORBIDDEN),
+        (RoleEnum.USER.value, HTTPStatus.FORBIDDEN),
+    ],
 )
 async def test_create_role_as_user(make_post_request, name, expected_status, tokens):
     access_token, _ = tokens

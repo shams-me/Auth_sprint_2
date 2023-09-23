@@ -3,14 +3,13 @@ import http
 import time
 from datetime import datetime, timezone
 from functools import wraps
-from typing import Optional, List, Annotated
+from typing import Annotated, List, Optional
 
 import aiohttp
 import jwt
-from fastapi import HTTPException, Request, Depends
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-
 from core.config import settings
+from fastapi import Depends, HTTPException, Request
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from models.oauth import Roles, User
 
 
@@ -24,43 +23,34 @@ class JWTBearer(HTTPBearer):
         if not credentials:
             raise HTTPException(
                 status_code=http.HTTPStatus.FORBIDDEN,
-                detail='Invalid authorization code'
+                detail="Invalid authorization code",
             )
-        if not credentials.scheme == 'Bearer':
+        if not credentials.scheme == "Bearer":
             raise HTTPException(
                 status_code=http.HTTPStatus.UNAUTHORIZED,
-                detail='Only Bearer token might be accepted'
+                detail="Only Bearer token might be accepted",
             )
         decoded_token = self.decode(credentials.credentials)
         if not decoded_token:
-            raise HTTPException(
-                status_code=http.HTTPStatus.FORBIDDEN,
-                detail='Invalid or expired token'
-            )
+            raise HTTPException(status_code=http.HTTPStatus.FORBIDDEN, detail="Invalid or expired token")
 
         if self.check_user:
             response = await self.check(
                 settings.auth_url_me,
                 params={},
-                headers={'Authorization': f'Bearer {credentials.credentials}'}
+                headers={"Authorization": f"Bearer {credentials.credentials}"},
             )
             if response.status != http.HTTPStatus.ACCEPTED:
-                raise HTTPException(
-                    status_code=http.HTTPStatus.FORBIDDEN,
-                    detail="User doesn't exist"
-                )
+                raise HTTPException(status_code=http.HTTPStatus.FORBIDDEN, detail="User doesn't exist")
             return await response.json()
         return decoded_token
 
     @staticmethod
     def decode(jwt_token: str) -> Optional[dict]:
         try:
-            decoded_token = jwt.decode(
-                jwt_token,
-                options={"verify_signature": False}
-            )
+            decoded_token = jwt.decode(jwt_token, options={"verify_signature": False})
             current_time = int(datetime.now(timezone.utc).timestamp())
-            return decoded_token if decoded_token['exp'] >= current_time else None
+            return decoded_token if decoded_token["exp"] >= current_time else None
         except Exception:
             return None
 

@@ -44,7 +44,10 @@ def get_movie_receiver(
     )
 
     return PostgresReceiver(
-        index=ElasticIndexName.MOVIE, query_manager=movie_query_manager, schema=FilmWork, database_url=database_url
+        index=ElasticIndexName.MOVIE,
+        query_manager=movie_query_manager,
+        schema=FilmWork,
+        database_url=database_url,
     )
 
 
@@ -63,7 +66,10 @@ def get_genre_receiver(
     )
 
     return PostgresReceiver(
-        index=ElasticIndexName.GENRE, query_manager=genre_query_manager, schema=Genre, database_url=database_url
+        index=ElasticIndexName.GENRE,
+        query_manager=genre_query_manager,
+        schema=Genre,
+        database_url=database_url,
     )
 
 
@@ -88,7 +94,10 @@ def get_person_receiver(
     )
 
     return PostgresReceiver(
-        index=ElasticIndexName.PERSON, query_manager=person_query_manager, schema=Person, database_url=database_url
+        index=ElasticIndexName.PERSON,
+        query_manager=person_query_manager,
+        schema=Person,
+        database_url=database_url,
     )
 
 

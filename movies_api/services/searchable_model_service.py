@@ -23,7 +23,11 @@ class SearchableModelService(Generic[T]):
         return item
 
     async def get_many_by_parameters(
-        self, page_number: int, page_size: int, search: str | None = None, sort: str | None = None
+        self,
+        page_number: int,
+        page_size: int,
+        search: str | None = None,
+        sort: str | None = None,
     ) -> list[Optional[T]]:
         items = await self.cache.get_list_from_cache(
             search=search, page_size=page_size, page_number=page_number, sort=sort
@@ -35,6 +39,10 @@ class SearchableModelService(Generic[T]):
             if not items:
                 return []
             await self.cache.put_list_to_cache(
-                search=search, page_number=page_number, page_size=page_size, sort=sort, instances=items
+                search=search,
+                page_number=page_number,
+                page_size=page_size,
+                sort=sort,
+                instances=items,
             )
         return items

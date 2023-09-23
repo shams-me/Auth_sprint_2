@@ -25,7 +25,11 @@ class SearchService(Generic[T]):
             return None
 
     async def get_by_parameters(
-        self, page_number: int, page_size: int, search: str | None = None, sort: str | None = None
+        self,
+        page_number: int,
+        page_size: int,
+        search: str | None = None,
+        sort: str | None = None,
     ) -> Optional[List[T]]:
         query = {
             "query": self._get_query_match(search=search),

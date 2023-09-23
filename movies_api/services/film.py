@@ -14,7 +14,8 @@ from .searchable_model_service import SearchableModelService
 
 @lru_cache()
 def get_film_service(
-    redis: CacheStorageProtocol = Depends(get_redis), elastic: SearchEngineProtocol = Depends(get_elastic)
+    redis: CacheStorageProtocol = Depends(get_redis),
+    elastic: SearchEngineProtocol = Depends(get_elastic),
 ) -> SearchableModelService:
     redis = FilmCachingService(cache_storage=redis, prefix_plural="movies", prefix_single="movie")
     elastic = FilmSearchService(search_engine=elastic, index="movies")

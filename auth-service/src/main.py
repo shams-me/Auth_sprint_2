@@ -1,18 +1,17 @@
+from api.v1 import auth, role, user_role
+from core.config import settings
+from db import postgres, redis
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from redis.asyncio import Redis
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-
-from api.v1 import auth, role, user_role
-from core.config import settings
-from db import redis, postgres
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 app = FastAPI(
     title=f"Read-only API for {settings.project_name}.",
     description="Information about Authorisation and Roles.",
     version="1.0.0",
-    docs_url='/api/openapi',
-    openapi_url='/api/openapi.json',
+    docs_url="/api/openapi",
+    openapi_url="/api/openapi.json",
     # root_path="/auth",
     default_response_class=ORJSONResponse,
 )
@@ -44,4 +43,3 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(app, host="localhost", port=8080)
-

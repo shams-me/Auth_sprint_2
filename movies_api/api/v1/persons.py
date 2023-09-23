@@ -2,11 +2,11 @@ from http import HTTPStatus
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-
 from models.oauth import Roles
 from models.person import Person
 from services.person import get_person_service
 from utils.oauth2 import allowed_user
+
 from .service_protocol import ModelServiceProtocol
 
 router = APIRouter()
@@ -21,10 +21,10 @@ router = APIRouter()
     dependencies=[Depends(allowed_user(roles=[Roles.SUPERUSER, Roles.ADMIN, Roles.MODERATOR]))],
 )
 async def person_details_list(
-        search: str = Query(None, description="Searching text"),
-        page_size: int = Query(50, ge=1, le=100, description="Number of persons per page"),
-        page_number: int = Query(1, ge=1, description="Page number"),
-        model_service: ModelServiceProtocol[Person] = Depends(get_person_service),
+    search: str = Query(None, description="Searching text"),
+    page_size: int = Query(50, ge=1, le=100, description="Number of persons per page"),
+    page_number: int = Query(1, ge=1, description="Page number"),
+    model_service: ModelServiceProtocol[Person] = Depends(get_person_service),
 ) -> List[Person]:
     persons = await model_service.get_many_by_parameters(
         search=search,
@@ -43,8 +43,8 @@ async def person_details_list(
     dependencies=[Depends(allowed_user(roles=[Roles.SUPERUSER, Roles.ADMIN, Roles.MODERATOR]))],
 )
 async def person_details(
-        person_id: str,
-        model_service: ModelServiceProtocol[Person] = Depends(get_person_service),
+    person_id: str,
+    model_service: ModelServiceProtocol[Person] = Depends(get_person_service),
 ) -> Person:
     person = await model_service.get_by_id(person_id)
     if not person:

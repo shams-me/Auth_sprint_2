@@ -8,7 +8,12 @@ from time_event_decorators.backoff import backoff_public_methods
 
 @backoff_public_methods()
 class ElasticLoader:
-    def __init__(self, es_configs: list[ElasticConfig], es_indexes: list[ElasticIndexName], es_url: str) -> None:
+    def __init__(
+        self,
+        es_configs: list[ElasticConfig],
+        es_indexes: list[ElasticIndexName],
+        es_url: str,
+    ) -> None:
         """
         Initialize the ElasticsearchLoader.
 

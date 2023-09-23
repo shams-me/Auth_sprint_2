@@ -3,12 +3,11 @@ from typing import Any, Dict, Generic, Optional, Type, TypeVar, Union
 from uuid import UUID
 
 from fastapi.encoders import jsonable_encoder
+from models.base import Base
 from pydantic import BaseModel
 from sqlalchemy import func, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-
-from models.base import Base
 
 ModelType = TypeVar("ModelType", bound=Base)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -16,7 +15,6 @@ UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
 
 class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
-
     def __init__(self, model: Type[ModelType], session: AsyncSession):
         """
         CRUD object with default methods to Create, Read, Update, Delete (CRUD).

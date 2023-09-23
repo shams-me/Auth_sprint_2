@@ -1,13 +1,12 @@
 from functools import lru_cache
 from uuid import UUID
 
+from db.postgres import get_postgres_session
 from fastapi import Depends
+from models.role import Permission, Role, RolePermission
+from services.crud import CRUDBase
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from db.postgres import get_postgres_session
-from models.role import Role, Permission, RolePermission
-from services.crud import CRUDBase
 
 
 class RoleService(CRUDBase):
@@ -65,5 +64,7 @@ class RoleService(CRUDBase):
 
 
 @lru_cache()
-def get_role_service(session: AsyncSession = Depends(get_postgres_session)) -> RoleService:
+def get_role_service(
+    session: AsyncSession = Depends(get_postgres_session),
+) -> RoleService:
     return RoleService(session=session)

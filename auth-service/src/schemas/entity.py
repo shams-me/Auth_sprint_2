@@ -53,22 +53,22 @@ class UserUpdate(BaseModel):
     new_password: str
     new_password_confirmation: str
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def check_passwords(self):
         old_pass = self.old_password
         new_pass = self.new_password
         if old_pass is None and new_pass is not None:
-            raise ValueError('You must provide old password to proceed change.')
+            raise ValueError("You must provide old password to proceed change.")
         if old_pass is not None and new_pass is None:
-            raise ValueError('You must provide previous and new passwords.')
+            raise ValueError("You must provide previous and new passwords.")
         return self
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def check_new_passwords_match(self):
         new_pass = self.new_password
         validation = self.new_password_confirmation
         if new_pass is not None and validation is not None and new_pass != validation:
-            raise ValueError('Passwords must match.')
+            raise ValueError("Passwords must match.")
         if new_pass is None and validation is not None or new_pass is not None and validation is None:
-            raise ValueError('You must provide both passwords.')
+            raise ValueError("You must provide both passwords.")
         return self
