@@ -19,7 +19,7 @@ from schemas.entity import (
     UserRegistration,
     UserUpdate,
 )
-from services.login.yandex import YandexProvider
+from services.oauth_providers.base import OAuthBase
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
@@ -162,15 +162,11 @@ class AuthServiceImpl(AbstractAuthService):
                 detail="Server error.",
             )
 
-    async def login_by_yandex(self, code: str, provider: YandexProvider, user_agent: str):
-        result = await provider.register(code)
-        if result is None:
+    async def login_by_provider(self, code: str, provider: OAuthBase, user_agent: str):
+        user = await provider.register(code)
+
+        if user is None:
             return HTTPStatus.BAD_REQUEST
-
-        user_id, email = result[0], result[1]
-
-        stmt = select(User).where(User.email == email)
-        user: User = await self.session.scalar(stmt)
 
         try:
             access, refresh = self.token_handler.get_access_refresh_pair(user)
@@ -185,7 +181,8 @@ class AuthServiceImpl(AbstractAuthService):
             await self.session.commit()
 
             return SuccessfulAuth(access_token=access, refresh_token=refresh)
-        except IntegrityError:
+        except Exception as e:
+            print(e)
             await self.session.rollback()
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

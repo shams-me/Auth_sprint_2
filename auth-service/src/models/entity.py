@@ -68,7 +68,7 @@ class SocialAccount(Base, TimestampMixin):
         nullable=False,
     )
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    user = relationship(User, backref=backref("social_accounts", lazy=True))
+    user = relationship(User, uselist=False, lazy="selectin")
 
     social_id = Column(String, nullable=False)
     social_name = Column(String, nullable=False)
@@ -111,9 +111,9 @@ class Device(Base):
         nullable=False,
     )
     user_agent = Column(String, nullable=False)
-    screen_width = Column(Integer, nullable=False)
-    screen_height = Column(Integer, nullable=False)
-    timezone = Column(String, nullable=False)
+    screen_width = Column(Integer, nullable=True)
+    screen_height = Column(Integer, nullable=True)
+    timezone = Column(String, nullable=True)
     last_login = Column(DateTime, default=datetime.utcnow)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     user = relationship("User", back_populates="devices")

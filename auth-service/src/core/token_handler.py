@@ -49,8 +49,11 @@ class ITokenHandler(ABC):
 
 class JWTHandler(ITokenHandler):
     def get_access_refresh_pair(self, user: User) -> tuple[str, str]:
+        role = "user"
+        if user.role:
+            role = user.role.name
         access_token = self.encode(
-            {"user_id": str(user.id), "role": user.role.name, "email": user.email},
+            {"user_id": str(user.id), "role": role, "email": user.email},
             TokenMinutesLifetime.ACCESS,
         )
         refresh_token = self.encode({"user_id": str(user.id)}, TokenMinutesLifetime.REFRESH)

@@ -1,4 +1,4 @@
-from api.v1 import auth, role, user_role
+from api.v1 import auth, oauth, role, user_role
 from core.config import settings
 from db import postgres, redis
 from fastapi import FastAPI
@@ -33,13 +33,12 @@ async def shutdown():
     await redis.redis.close()
 
 
-# Подключаем роутер к серверу, указав префикс /v1/films
 app.include_router(auth.router, prefix="/api/v1/auth")
 app.include_router(role.router, prefix="/api/v1/roles")
 app.include_router(user_role.router, prefix="/api/v1/user_roles")
-
+app.include_router(oauth.router, prefix="/api/v1/oauth")
 
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="localhost", port=8080)
+    uvicorn.run(app, host="localhost", port=80)

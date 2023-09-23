@@ -1,8 +1,7 @@
-from http import HTTPStatus
 from typing import Annotated
 
 from dependencies.current_user import get_current_user
-from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from schemas.entity import (
     SuccessfulAuth,
@@ -13,10 +12,7 @@ from schemas.entity import (
     UserRegistration,
     UserUpdate,
 )
-from services.auth import AbstractAuthService, AuthServiceImpl, get_auth_service
-from services.login.base import OAuthLogin
-from services.login.yandex import YandexProvider, yandex_provider
-from starlette.responses import RedirectResponse
+from services.auth import AbstractAuthService, get_auth_service
 
 router = APIRouter()
 
@@ -88,40 +84,6 @@ async def login_user(body: UserLogin, auth_service=Depends(get_auth_service)) ->
             detail="Provided data was incorrect, try again.",
         )
     return response
-
-
-@router.post(
-    "/login/{provider}",
-    response_class=RedirectResponse,
-    status_code=HTTPStatus.SEE_OTHER,
-    summary="Login using providers",
-    tags=["Auth"],
-)
-async def provider_login(
-    provider: str,
-):
-    provider = OAuthLogin.get_provider(provider)
-    if provider:
-        return provider.get_auth_url()
-    raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Provider was not found")
-
-
-@router.get(
-    "/login/yandex/redirect",
-    response_model=SuccessfulAuth,
-    status_code=HTTPStatus.ACCEPTED,
-    summary="Login with yandex oauth2.0",
-    tags=["Auth"],
-)
-async def yandex_login_redirect(
-    code: str,
-    request: Request,
-    ya_provider: YandexProvider = Depends(yandex_provider),
-    auth_service: AuthServiceImpl = Depends(get_auth_service),
-):
-    user_agent = request.headers.get("User-Agent")
-    login_result = await auth_service.login_by_yandex(code=code, provider=ya_provider, user_agent=user_agent)
-    return login_result
 
 
 @router.post(
