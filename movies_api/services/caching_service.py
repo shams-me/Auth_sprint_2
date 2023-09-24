@@ -26,7 +26,7 @@ class CachingService(Generic[T]):
         self.tracer = tracer
 
     async def get_instance_from_cache(self, instance_id: str) -> Optional[T]:
-        with self.tracer.start_as_current_span("get-instance-cache"):
+        with self.tracer.start_as_current_span("get-cache"):
             cache_key = f"{self.key_prefix_single}_{instance_id}"
             data = await self.cache_storage.get(cache_key)
             if not data:
@@ -40,7 +40,7 @@ class CachingService(Generic[T]):
         search: str | None = None,
         sort: str | None = None,
     ) -> List[T]:
-        with self.tracer.start_as_current_span("get-list-cache"):
+        with self.tracer.start_as_current_span("get-cache"):
             cache_key = f"{self.key_prefix_plural}_{search or ''}_{sort or ''}_{page_size}_{page_number}"
             data = await self.cache_storage.get(cache_key)
             if not data:
@@ -49,7 +49,7 @@ class CachingService(Generic[T]):
             return [self._parse_instance_from_data(item) for item in items]
 
     async def put_instance_to_cache(self, instance: T):
-        with self.tracer.start_as_current_span("put-instance-cache"):
+        with self.tracer.start_as_current_span("put-cache"):
             cache_key = f"{self.key_prefix_single}_{instance.id}"
             await self.cache_storage.set(
                 cache_key,
@@ -65,7 +65,7 @@ class CachingService(Generic[T]):
         instances: List[T],
         search: str | None = None,
     ):
-        with self.tracer.start_as_current_span("put-list-cache"):
+        with self.tracer.start_as_current_span("put-cache"):
             cache_key = f"{self.key_prefix_plural}_{search or ''}_{sort or ''}_{page_size}_{page_number}"
             instances_json_list = [instance.model_dump_json() for instance in instances]
             instances_json_str = orjson.dumps(instances_json_list)
