@@ -1,6 +1,7 @@
 from api.v1 import auth, oauth, role, user_role
 from core.config import settings
 from db import postgres, redis
+from db.tracer import get_tracer
 from fastapi import FastAPI, Request, status
 from fastapi.responses import ORJSONResponse
 from opentelemetry import trace
@@ -36,11 +37,14 @@ FastAPIInstrumentor.instrument_app(app)
 
 @app.middleware("http")
 async def before_request(request: Request, call_next):
-    response = await call_next(request)
     request_id = request.headers.get("X-Request-Id")
     if not request_id:
         return ORJSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"detail": "X-Request-Id is required"})
-    return response
+    tracer: trace.Tracer = await get_tracer()
+    with tracer.start_as_current_span("auth-api") as span:
+        span.set_attribute("http.request_id", request_id)
+        response = await call_next(request)
+        return response
 
 
 @app.on_event("startup")
