@@ -7,6 +7,7 @@ from models.film import Film
 from models.sort import MoviesSortOptions
 from opentelemetry import trace
 from services.film import get_film_service
+from utils.tracer_utils import set_span_tag_request_id
 
 from .service_protocol import ModelServiceProtocol
 
@@ -33,8 +34,7 @@ async def film_details_list(
     tracer: trace.Tracer = Depends(get_tracer),
 ) -> List[Film]:
     with tracer.start_as_current_span("film_details_list") as span:
-        request_id = request.headers.get("X-Request-Id")
-        span.set_attribute("http.request_id", request_id)
+        set_span_tag_request_id(request, span)
         films = await model_service.get_many_by_parameters(
             search=search,
             page_number=page_number,
@@ -57,8 +57,7 @@ async def film_details(
     tracer: trace.Tracer = Depends(get_tracer),
 ) -> Film:
     with tracer.start_as_current_span("film_details") as span:
-        request_id = request.headers.get("X-Request-Id")
-        span.set_attribute("http.request_id", request_id)
+        set_span_tag_request_id(request, span)
         film = await model_service.get_by_id(film_id)
         if not film:
             raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="film not found")

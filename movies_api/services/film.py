@@ -21,5 +21,5 @@ def get_film_service(
     tracer: trace.Tracer = Depends(get_tracer),
 ) -> SearchableModelService:
     redis = FilmCachingService(cache_storage=redis, prefix_plural="movies", prefix_single="movie", tracer=tracer)
-    elastic = FilmSearchService(search_engine=elastic, index="movies")
+    elastic = FilmSearchService(search_engine=elastic, index="movies", tracer=tracer)
     return SearchableModelService[Film](caching_service=redis, search_service=elastic)

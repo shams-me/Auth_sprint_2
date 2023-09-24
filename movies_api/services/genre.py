@@ -21,5 +21,5 @@ def get_genre_service(
     tracer: trace.Tracer = Depends(get_tracer),
 ) -> SearchableModelService:
     redis = GenreCachingService(cache_storage=redis, prefix_single="genre", prefix_plural="genres", tracer=tracer)
-    elastic = GenreSearchService(search_engine=elastic, index="genres")
+    elastic = GenreSearchService(search_engine=elastic, index="genres", tracer=tracer)
     return SearchableModelService[Genre](caching_service=redis, search_service=elastic)

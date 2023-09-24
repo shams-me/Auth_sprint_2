@@ -22,5 +22,5 @@ def get_person_service(
     tracer: trace.Tracer = Depends(get_tracer),
 ) -> SearchableModelService:
     redis = PersonCachingService(cache_storage=redis, prefix_plural="persons", prefix_single="person", tracer=tracer)
-    elastic = PersonSearchService(search_engine=elastic, index="persons")
+    elastic = PersonSearchService(search_engine=elastic, index="persons", tracer=tracer)
     return SearchableModelService[Person](caching_service=redis, search_service=elastic)
