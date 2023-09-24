@@ -5,6 +5,7 @@ from elasticsearch import NotFoundError
 from models.film import Film
 from models.genre import Genre
 from models.person import Person
+from opentelemetry import trace
 from pydantic import BaseModel
 from search_engine.search_engine_protocol import SearchEngineProtocol
 
@@ -13,14 +14,16 @@ T = TypeVar("T", bound=BaseModel)
 
 @backoff_public_methods()
 class SearchService(Generic[T]):
-    def __init__(self, search_engine: SearchEngineProtocol, index: str):
+    def __init__(self, search_engine: SearchEngineProtocol, index: str, tracer: trace.Tracer):
         self.search_engine = search_engine
         self.index = index
+        self.tracer = tracer
 
     async def get_by_id(self, instance_id: str) -> Optional[T]:
         try:
-            doc = await self.search_engine.get(index=self.index, id=instance_id)
-            return self._deserialize(doc)
+            with self.tracer.start_as_current_span("search-index"):
+                doc = await self.search_engine.get(index=self.index, id=instance_id)
+                return self._deserialize(doc)
         except NotFoundError:
             return None
 
@@ -41,10 +44,11 @@ class SearchService(Generic[T]):
             query["sort"] = self._get_sort_params(sort=sort)
 
         try:
-            doc = await self.search_engine.search(
-                index=self.index,
-                body=query,
-            )
+            with self.tracer.start_as_current_span("search-index"):
+                doc = await self.search_engine.search(
+                    index=self.index,
+                    body=query,
+                )
         except NotFoundError:
             return None
         documents = doc["hits"]["hits"]
