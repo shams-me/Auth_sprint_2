@@ -11,6 +11,7 @@ from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
+from rate_limit.token_bucket import TokenBucket
 from redis.asyncio import Redis
 
 
@@ -45,6 +46,18 @@ async def before_request(request: Request, call_next):
         span.set_attribute("http.request_id", request_id)
         response = await call_next(request)
         return response
+
+
+token_bucket = TokenBucket(rate=1, capacity=10)
+
+
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    if not token_bucket.acquire_token():
+        raise ORJSONResponse(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="Too Many Requests")
+
+    response = await call_next(request)
+    return response
 
 
 @app.on_event("startup")
