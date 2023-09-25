@@ -1,5 +1,6 @@
 from typing import Generic, Optional, TypeVar
 
+from opentelemetry import trace
 from pydantic import BaseModel
 
 from .caching_service import CachingService

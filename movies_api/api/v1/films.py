@@ -1,9 +1,11 @@
 from http import HTTPStatus
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from db.tracer import get_tracer
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from models.film import Film
 from models.sort import MoviesSortOptions
+from opentelemetry import trace
 from services.film import get_film_service
 
 from .service_protocol import ModelServiceProtocol
@@ -43,7 +45,10 @@ async def film_details_list(
     tags=["Movies"],
     response_model=Film,
 )
-async def film_details(film_id: str, model_service: ModelServiceProtocol[Film] = Depends(get_film_service)) -> Film:
+async def film_details(
+    film_id: str,
+    model_service: ModelServiceProtocol[Film] = Depends(get_film_service),
+) -> Film:
     film = await model_service.get_by_id(film_id)
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="film not found")
