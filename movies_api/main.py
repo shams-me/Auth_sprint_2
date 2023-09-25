@@ -2,8 +2,9 @@ from api.v1 import films, genres, persons
 from core.config import settings
 from db import elastic, redis
 from elasticsearch import AsyncElasticsearch
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
 from fastapi.responses import ORJSONResponse
+from rate_limit.token_bucket import TokenBucket
 from redis.asyncio import Redis
 
 app = FastAPI(
@@ -15,6 +16,16 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
     # root_path="/movies"
 )
+token_bucket = TokenBucket(rate=1, capacity=10)
+
+
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    if not token_bucket.acquire_token():
+        raise ORJSONResponse(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="Too Many Requests")
+
+    response = await call_next(request)
+    return response
 
 
 @app.on_event("startup")
