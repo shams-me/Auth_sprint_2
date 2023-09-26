@@ -5,7 +5,7 @@ from logging import config as logging_config
 
 from core.logger import LOGGING
 from models.entity import User
-from models.role import Role, RoleEnum, UserRoles
+from models.role import Role, RoleEnum
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.future import select
 
@@ -34,10 +34,6 @@ async def create_superuser(session, email, password, username, role_id):
     session.add(user)
     await session.commit()
 
-    user_role = UserRoles(user_id=user.id, role_id=role_id)
-    session.add(user_role)
-    await session.commit()
-
 
 async def get_or_create_role(session: AsyncSession, role: RoleEnum) -> Role:
     superuser_role = await get_role_by_name(session, role.value)
@@ -50,7 +46,7 @@ async def get_or_create_role(session: AsyncSession, role: RoleEnum) -> Role:
 async def get_or_create_superuser(session: AsyncSession, role_id: uuid.UUID):
     superuser = await get_user_by_email(session, settings.super_user_mail)
     if not superuser:
-        superuser = await create_superuser(
+        await create_superuser(
             session,
             settings.super_user_mail,
             settings.super_user_pass,

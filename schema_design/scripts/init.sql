@@ -1,5 +1,6 @@
 CREATE SCHEMA IF NOT EXISTS content;
-ALTER ROLE app SET search_path TO content,public;
+CREATE SCHEMA IF NOT EXISTS auth;
+ALTER ROLE app SET search_path TO content,auth,public;
 
 CREATE TYPE content.film_work_type AS ENUM ('movie', 'tv_show');
 

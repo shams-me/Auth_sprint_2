@@ -41,7 +41,7 @@ class Role(Base, TimestampMixin):
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name: Mapped[Optional[str]] = mapped_column(String(1024), Enum(RoleEnum), unique=True)
     permissions: Mapped[list["Permission"]] = relationship(
-        "Permission", secondary="role_permissions", uselist=True, lazy="selectin"
+        "Permission", secondary="auth.role_permissions", uselist=True, lazy="selectin"
     )
 
     def __repr__(self):

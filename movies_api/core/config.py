@@ -11,7 +11,8 @@ logging_config.dictConfig(LOGGING)
 class Settings(BaseSettings):
     project_name: str = Field("movies", env="PROJECT_NAME")
 
-    auth_url_me: str = Field("http://localhost:8080/api/v1/auth/me", env="AUTH_URL_ME")
+    auth_service_host: str = Field("auth-api", env="AUTH_SERVICE_HOST")
+    auth_service_port: str = Field(8000, env="AUTH_SERVICE_PORT")
 
     cache_expire_time: int = Field(300, env="CACHE_EXPIRE_TIME_IN_SECONDS")
 
@@ -23,9 +24,11 @@ class Settings(BaseSettings):
     elastic_schema: str = Field("http", env="ELASTIC_SCHEME")
 
     @property
-    def elastic_url(
-        self,
-    ):
+    def auth_url_me(self) -> str:
+        return f"http://{self.auth_service_host}:{self.auth_service_port}/auth/api/v1/auth/me"
+
+    @property
+    def elastic_url(self):
         return f"{self.elastic_schema}://{self.elastic_host}:{self.elastic_port}"
 
 

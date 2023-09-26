@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from models.oauth import Roles
 from models.person import Person
 from services.person import get_person_service
-from utils.oauth2 import allowed_user
+from utils.oauth import allowed_user
 
 from .service_protocol import ModelServiceProtocol
 

@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer
 from services.auth import AbstractAuthService, get_auth_service
 from starlette import status
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/api/v1/auth/token")
 
 
 async def get_current_user(

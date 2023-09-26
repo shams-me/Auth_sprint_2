@@ -1,12 +1,13 @@
 import datetime
 
+from sqlalchemy import MetaData
 from sqlalchemy.dialects.postgresql import TIMESTAMP
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql.functions import func
 
-
-class Base(DeclarativeBase):
-    pass
+metadata = MetaData(schema="auth")
+Base = declarative_base(metadata=metadata)
 
 
 class TimestampMixin:

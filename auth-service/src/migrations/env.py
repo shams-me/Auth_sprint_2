@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from logging.config import fileConfig
 
 from alembic import context
@@ -10,6 +11,7 @@ from models.role import Permission, Role, RolePermission
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
+from sqlalchemy.sql.schema import SchemaItem
 
 __all__ = [
     "Role",
@@ -36,6 +38,14 @@ target_metadata = Base.metadata
 config.set_main_option("sqlalchemy.url", settings.construct_sqlalchemy_url())
 
 
+def include_object(object: SchemaItem, name, type_, reflected, compare_to) -> bool:
+    if type_ == "table" and object.schema == "auth":
+        return True
+
+    logging.info(f"Skipping {type_} {object.schema}.{name}")
+    return False
+
+
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -52,6 +62,7 @@ def run_migrations_offline() -> None:
     context.configure(
         url=url,
         target_metadata=target_metadata,
+        include_object=include_object,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
     )
@@ -61,7 +72,7 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    context.configure(connection=connection, target_metadata=target_metadata)
+    context.configure(connection=connection, target_metadata=target_metadata, include_object=include_object)
 
     with context.begin_transaction():
         context.run_migrations()

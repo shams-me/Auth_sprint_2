@@ -1,8 +1,5 @@
-import base64
 import http
-import time
 from datetime import datetime, timezone
-from functools import wraps
 from typing import Annotated, List, Optional
 
 import aiohttp
@@ -10,7 +7,7 @@ import jwt
 from core.config import settings
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from models.oauth import Roles, User
+from models.oauth import Roles
 
 
 class JWTBearer(HTTPBearer):
@@ -37,10 +34,9 @@ class JWTBearer(HTTPBearer):
         if self.check_user:
             response = await self.check(
                 settings.auth_url_me,
-                params={},
                 headers={"Authorization": f"Bearer {credentials.credentials}"},
             )
-            if response.status != http.HTTPStatus.ACCEPTED:
+            if response.status != http.HTTPStatus.OK:
                 raise HTTPException(status_code=http.HTTPStatus.FORBIDDEN, detail="User doesn't exist")
             return await response.json()
         return decoded_token
@@ -55,9 +51,11 @@ class JWTBearer(HTTPBearer):
             return None
 
     @staticmethod
-    async def check(query: str, params: dict = {}, headers: dict = {}, json: dict = {}):
-        async with aiohttp.ClientSession(headers=headers) as client:
-            response = await client.get(query, json=json, params=params)
+    async def check(url: str, headers: dict):
+        header = {"accept": "application/json", "Content-Type": "application/json"}
+
+        async with aiohttp.ClientSession() as client:
+            response = await client.get(url, headers=headers.update(header))
         return response
 
 
@@ -66,7 +64,7 @@ security_jwt_verified = JWTBearer(check_user=True)
 
 
 def allowed_user(roles: List[Roles]):
-    def decorator(user: Annotated[dict, Depends(security_jwt_verified)]):
+    def decorator(user: Annotated[dict, Depends(security_jwt)]):
         if user["role"] == Roles.SUPERUSER:
             return
 
