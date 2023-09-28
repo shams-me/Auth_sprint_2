@@ -44,6 +44,9 @@ class Settings(BaseSettings):
     service_host: str = Field("127.0.0.1")
     service_port: str | int = Field(8000)
 
+    token_bucket_capacity: int = Field(default=10)
+    token_bucket_rate: int = Field(default=1)
+
     @property
     def postgres_url(self):
         return f"{self.postgres_user}:{self.postgres_password}@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"

@@ -35,7 +35,7 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
 )
 FastAPIInstrumentor.instrument_app(app)
-token_bucket = TokenBucket(rate=1, capacity=10)
+token_bucket = TokenBucket(rate=settings.token_bucket_rate, capacity=settings.token_bucket_capacity)
 
 
 @app.middleware("http")
