@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     postgres_password: str = Field(default="1", env="POSTGRES_PASSWORD")
     postgres_db: str = Field(default="test", env="POSTGRES_DB")
 
+    jaeger_host: str = Field(default="jaeger")
+    jaeger_port: int = Field(default=6831)
+
     super_user_pass: str = Field("some_mega_hard_pass", env="SUPER_USER_PASS")
     super_user_mail: str = Field("superuser@god.com", env="SUPER_USER_MAIL")
 

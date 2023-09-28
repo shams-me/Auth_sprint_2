@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 
 def configure_tracer() -> None:
-    jaeger_exporter = JaegerExporter(agent_host_name="jaeger", agent_port=6831)
+    jaeger_exporter = JaegerExporter(agent_host_name=settings.jaeger_host, agent_port=settings.jaeger_port)
     trace.set_tracer_provider(TracerProvider(resource=Resource.create({SERVICE_NAME: "auth-service"})))
     trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(jaeger_exporter))
     # Чтобы видеть трейсы в консоли
