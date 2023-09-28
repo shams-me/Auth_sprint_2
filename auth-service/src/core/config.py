@@ -36,6 +36,7 @@ class Settings(BaseSettings):
 
     jaeger_host: str = Field(default="jaeger")
     jaeger_port: int = Field(default=6831)
+    jaeger_enable_tracer: bool = Field(default=True)
 
     super_user_pass: str = Field("some_mega_hard_pass", env="SUPER_USER_PASS")
     super_user_mail: str = Field("superuser@god.com", env="SUPER_USER_MAIL")
