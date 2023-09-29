@@ -10,20 +10,19 @@ from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
+from rate_limit.token_bucket import TokenBucket
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 
 def configure_tracer() -> None:
+    if not settings.jaeger_enable_tracer:
+        return-
     jaeger_exporter = JaegerExporter(agent_host_name=settings.jaeger_host, agent_port=settings.jaeger_port)
     trace.set_tracer_provider(TracerProvider(resource=Resource.create({SERVICE_NAME: "auth-service"})))
     trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(jaeger_exporter))
     # Чтобы видеть трейсы в консоли
     trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(ConsoleSpanExporter()))
-
-
-if settings.enable_tracer:
-    configure_tracer()
 
 app = FastAPI(
     title=f"Read-only API for {settings.project_name}.",
@@ -35,6 +34,7 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
 )
 FastAPIInstrumentor.instrument_app(app)
+token_bucket = TokenBucket(rate=settings.token_bucket_rate, capacity=settings.token_bucket_capacity)
 
 
 @app.middleware("http")
@@ -47,6 +47,14 @@ async def before_request(request: Request, call_next):
         span.set_attribute("http.request_id", request_id)
         response = await call_next(request)
         return response
+
+
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    if not token_bucket.acquire_token():
+        raise ORJSONResponse(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="Too Many Requests")
+    response = await call_next(request)
+    return response
 
 
 @app.on_event("startup")

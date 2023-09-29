@@ -33,9 +33,9 @@ class Settings(BaseSettings):
     postgres_password: str = Field(default="1", env="POSTGRES_PASSWORD")
     postgres_db: str = Field(default="test", env="POSTGRES_DB")
 
-    redis_host: str = Field("127.0.0.1", env="REDIS_PORT")
-    redis_port: int = Field(6379, env="PROJECT_NAME")
-
+    jaeger_host: str = Field(default="jaeger")
+    jaeger_port: int = Field(default=6831)
+    jaeger_enable_tracer: bool = Field(default=True)
     super_user_pass: str = Field("some_mega_hard_pass", env="SUPER_USER_PASS")
     super_user_mail: str = Field("superuser@god.com", env="SUPER_USER_MAIL")
 
@@ -44,6 +44,9 @@ class Settings(BaseSettings):
 
     service_host: str = Field("127.0.0.1")
     service_port: str | int = Field(8000)
+
+    token_bucket_capacity: int = Field(default=10)
+    token_bucket_rate: int = Field(default=1)
 
     @property
     def postgres_url(self):

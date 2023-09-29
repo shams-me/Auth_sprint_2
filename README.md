@@ -24,27 +24,32 @@ git clone https://github.com/shams-me/Auth_sprint_2.git
 
 2. Set up the environment variables in an .env file in the root of the project:
 
-| Variable                       | Explanation                              | Example                |
-|--------------------------------|------------------------------------------|------------------------|
-| `POSTGRES_HOST`                | PostgreSQL Hostname                      | `postgres_test`        |
-| `POSTGRES_PASSWORD`            | PostgreSQL Password                      | `123qwe`               |
-| `POSTGRES_USER`                | PostgreSQL User                          | `app`                  |
-| `POSTGRES_DB`                  | PostgreSQL Database Name                 | `movies_database`      |
-| `POSTGRES_PORT`                | PostgreSQL Port                          | `5432`                 |
-| `ELASTIC_HOST`                 | ElasticSearch HOST                       | `elasticsearch`        |
-| `ELASTIC_PORT`                 | ElasticSearch Port                       | `9200`                 |
-| `ELASTIC_SCHEME`               | ElasticSearch schema http/https          | `http`                 |
-| `REDIS_HOST`                   | Redis Hostname                           | `redis_test`           |
-| `REDIS_PORT`                   | Redis Port                               | `6379`                 |
-| `JWT_SECRET`                   | Secret key to generate token             | `some_mega_hard_pass`  |
-| `AUTH_SERVICE_HOST`            | Service Host                             | `localhost`            |
-| `AUTH_SERVICE_PORT`            | Service Port                             | `8000`                 |
-| `CACHE_EXPIRE_TIME_IN_SECONDS` | Cache expire time                        | `600`                  |
-| `SUPER_USER_MAIL`              | SuperUser main                           | `superuser@gmail.com`  |
-| `SUPER_USER_PASS`              | SuperUser pass                           | `superpass`            |
-| `DEBUG`                        | Django admin debug mode                  | `False/True`           |
-| `SECRET_KEY`                   | Django admin secret key                  | `some_mega_hard_token` |
-| `ALLOWED_HOSTS`                | Django admin allowed hosts separate by , | `localhost,127.0.0.1`  |
+| Variable                       | Explanation                                | Example                                              |
+|--------------------------------|--------------------------------------------|------------------------------------------------------|
+| `POSTGRES_HOST`                | PostgreSQL Hostname                        | `postgres_test`                                      |
+| `POSTGRES_PASSWORD`            | PostgreSQL Password                        | `123qwe`                                             |
+| `POSTGRES_USER`                | PostgreSQL User                            | `app`                                                |
+| `POSTGRES_DB`                  | PostgreSQL Database Name                   | `movies_database`                                    |
+| `POSTGRES_PORT`                | PostgreSQL Port                            | `5432`                                               |
+| `ELASTIC_HOST`                 | ElasticSearch HOST                         | `elasticsearch`                                      |
+| `ELASTIC_PORT`                 | ElasticSearch Port                         | `9200`                                               |
+| `ELASTIC_SCHEME`               | ElasticSearch schema http/https            | `http`                                               |
+| `REDIS_HOST`                   | Redis Hostname                             | `redis_test`                                         |
+| `REDIS_PORT`                   | Redis Port                                 | `6379`                                               |
+| `JWT_SECRET`                   | Secret key to generate token               | `some_mega_hard_pass`                                |
+| `AUTH_SERVICE_HOST`            | Service Host                               | `localhost`                                          |
+| `AUTH_SERVICE_PORT`            | Service Port                               | `8000`                                               |
+| `CACHE_EXPIRE_TIME_IN_SECONDS` | Cache expire time                          | `600`                                                |
+| `SUPER_USER_MAIL`              | SuperUser main                             | `superuser@gmail.com`                                |
+| `SUPER_USER_PASS`              | SuperUser pass                             | `superpass`                                          |
+| `DEBUG`                        | Django admin debug mode                    | `False/True`                                         |
+| `SECRET_KEY`                   | Django admin secret key                    | `some_mega_hard_token`                               |
+| `ALLOWED_HOSTS`                | Django admin allowed hosts separate by ,   | `localhost,127.0.0.1`                                |
+| `JAEGER_HOST`                  | Host for jaeger                            | `localhost, jaeger, 127.0.0.1`                       |
+ | `JAEGER_PORT`                  | Jaeger port                                | `6831`                                               |
+ | `JAEGER_ENABLE_TRACER`         | Switcher to turn on/off jaeger             | `1/0`, `true/false`, `t/f`, `off/on`, `n/y`, `no/yes` |
+ | `TOKEN_BUCKET_CAPACITY`        | How many tokens at one time are achivable  | `10, etc` |
+ | `TOKEN_BUCKET_RATE`            | Speed of restoring tokens, bigger = faster | `1, etc` |
 
 </br>
 
