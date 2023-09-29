@@ -4,3 +4,5 @@ django-debug-toolbar==3.4.0
 django-split-settings==1.2.0
 python-dotenv==1.0.0
 psycopg2==2.9.6
+PyJWT==2.8.0
+requests

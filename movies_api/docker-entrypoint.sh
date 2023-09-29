@@ -16,4 +16,5 @@ wait_for_service() {
 wait_for_service elasticsearch 9200
 wait_for_service redis 6379
 
-uvicorn main:app --host 0.0.0.0 --port 8000 --workers $UVICORN_WORKERS_NUM
+#uvicorn main:app --host 0.0.0.0 --port 8000 --workers $UVICORN_WORKERS_NUM
+python3 main.py

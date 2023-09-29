@@ -7,6 +7,7 @@ services:
     ports:
       - "80:80"
     volumes:
+      - ./django_api/static/:/opt/app/static:ro
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/site.conf:/etc/nginx/conf.d/default.conf
     depends_on:
@@ -22,8 +23,6 @@ services:
       - "8000"
     env_file:
       - .env.example
-    volumes:
-      - ./volumes/auth/versions:/app/src/migrations/versions:ro
 
   movies-api:
     build: movies_api

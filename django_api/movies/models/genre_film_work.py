@@ -6,7 +6,7 @@ from .mix_in import UUIDMixin
 class GenreFilmWork(UUIDMixin):
     film_work = models.ForeignKey("FilmWork", on_delete=models.CASCADE)
     genre = models.ForeignKey("Genre", on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'content"."genre_film_work'

@@ -11,8 +11,15 @@ logging_config.dictConfig(LOGGING)
 class Settings(BaseSettings):
     project_name: str = Field("movies", env="PROJECT_NAME")
 
-    auth_service_host: str = Field("auth-api", env="AUTH_SERVICE_HOST")
-    auth_service_port: str = Field(8000, env="AUTH_SERVICE_PORT")
+    token_bucket_capacity: int = Field(10, env="TOKEN_BUCKET_CAPACITY")
+    token_bucket_rate: int = Field(1, env="TOKEN_BUCKET_RATE")
+
+    jaeger_host: str = Field("jaeger", env="JAEGER_HOST")
+    jaeger_port: int = Field(6831, env="JAEGER_PORT")
+    jaeger_enable_tracer: bool = Field(default=True, env="JAEGER_ENABLE_TRACER")
+
+    auth_service_host: str = Field("127.0.0.1", env="AUTH_SERVICE_HOST")
+    auth_service_port: int = Field(8080, env="AUTH_SERVICE_PORT")
 
     cache_expire_time: int = Field(300, env="CACHE_EXPIRE_TIME_IN_SECONDS")
 
@@ -25,7 +32,7 @@ class Settings(BaseSettings):
 
     @property
     def auth_url_me(self) -> str:
-        return f"http://{self.auth_service_host}:{self.auth_service_port}/auth/api/v1/auth/me"
+        return f"http://{self.auth_service_host}:{self.auth_service_port}/api/v1/auth/me"
 
     @property
     def elastic_url(self):

@@ -8,8 +8,6 @@ __pycache__/
 
 # custom
 /volumes
-/elastic_volume
-/auth-service/src/migrations/versions/*
 .flake8
 
 .ds_store

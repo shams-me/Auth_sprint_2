@@ -1,11 +1,9 @@
 from http import HTTPStatus
 from typing import List
 
-from db.tracer import get_tracer
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query
 from models.film import Film
 from models.sort import MoviesSortOptions
-from opentelemetry import trace
 from services.film import get_film_service
 
 from .service_protocol import ModelServiceProtocol

@@ -16,10 +16,9 @@ class Settings(BaseSettings):
 
     cache_expire_time: int = Field(600, env="CACHE_EXPIRE_TIME_IN_SECONDS")
 
-    redis_host: str = Field("127.0.0.1", env="REDIS_PORT")
-    redis_port: int = Field(6379, env="PROJECT_NAME")
-
     jwt_secret: str = Field("some_mega_encrypting_word", env="JWT_SECRET")
+
+    enable_tracer: bool = Field(True, env="ENABLE_TRACER")
 
     YANDEX_CLIENT_ID: str = Field("5fae3168fba440d48acd176ccd9f4a85", env="YANDEX_CLIENT_ID")
     YANDEX_CLIENT_SECRET: str = Field("95f335c9847e4f93af00d7980a1b7c30", env="YANDEX_CLIENT_SECRET")
@@ -37,9 +36,11 @@ class Settings(BaseSettings):
     jaeger_host: str = Field(default="jaeger")
     jaeger_port: int = Field(default=6831)
     jaeger_enable_tracer: bool = Field(default=True)
-
     super_user_pass: str = Field("some_mega_hard_pass", env="SUPER_USER_PASS")
     super_user_mail: str = Field("superuser@god.com", env="SUPER_USER_MAIL")
+
+    jaeger_host: str = Field("jaeger", env="JAEGER_HOST")
+    jaeger_port: int = Field(6831, env="JAEGER_PORT")
 
     service_host: str = Field("127.0.0.1")
     service_port: str | int = Field(8000)

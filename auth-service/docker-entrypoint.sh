@@ -16,7 +16,6 @@ wait_for_service() {
 wait_for_service postgres 5432
 wait_for_service redis 6379
 
-alembic revision --autogenerate -m "init"
 alembic upgrade head
 
 python3 src/create_superuser.py
