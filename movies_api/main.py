@@ -16,7 +16,9 @@ from redis.asyncio import Redis
 
 
 def configure_tracer() -> None:
-    jaeger_exporter = JaegerExporter(agent_host_name="jaeger", agent_port=6831)
+    if not settings.jaeger_enable_tracer:
+        return
+    jaeger_exporter = JaegerExporter(agent_host_name=settings.jaeger_host, agent_port=settings.jaeger_port)
     trace.set_tracer_provider(TracerProvider(resource=Resource.create({SERVICE_NAME: "movies-api"})))
     trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(jaeger_exporter))
     # Чтобы видеть трейсы в консоли
@@ -48,7 +50,7 @@ async def before_request(request: Request, call_next):
         return response
 
 
-token_bucket = TokenBucket(rate=1, capacity=10)
+token_bucket = TokenBucket(rate=settings.token_bucket_rate, capacity=settings.token_bucket_capacity)
 
 
 @app.middleware("http")
@@ -93,4 +95,4 @@ app.include_router(
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="localhost", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

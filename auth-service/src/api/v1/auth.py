@@ -76,7 +76,7 @@ async def token(
     tags=["Auth"],
     response_model=SuccessfulAuth,
 )
-async def login_user(body: UserLogin, auth_service=Depends(get_auth_service)) -> SuccessfulAuth:
+async def login_user(body: UserLogin, auth_service: AbstractAuthService = Depends(get_auth_service)) -> SuccessfulAuth:
     response = await auth_service.login(body)
     if not response:
         raise HTTPException(

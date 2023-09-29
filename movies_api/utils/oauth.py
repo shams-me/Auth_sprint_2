@@ -17,6 +17,7 @@ class JWTBearer(HTTPBearer):
 
     async def __call__(self, request: Request) -> dict:
         credentials: HTTPAuthorizationCredentials = await super().__call__(request)
+
         if not credentials:
             raise HTTPException(
                 status_code=http.HTTPStatus.FORBIDDEN,
@@ -30,11 +31,13 @@ class JWTBearer(HTTPBearer):
         decoded_token = self.decode(credentials.credentials)
         if not decoded_token:
             raise HTTPException(status_code=http.HTTPStatus.FORBIDDEN, detail="Invalid or expired token")
-
         if self.check_user:
             response = await self.check(
                 settings.auth_url_me,
-                headers={"Authorization": f"Bearer {credentials.credentials}"},
+                headers={
+                    "Authorization": f"Bearer {credentials.credentials}",
+                    "X-Request-Id": request.headers["X-Request-Id"],
+                },
             )
             if response.status != http.HTTPStatus.OK:
                 raise HTTPException(status_code=http.HTTPStatus.FORBIDDEN, detail="User doesn't exist")
@@ -52,10 +55,8 @@ class JWTBearer(HTTPBearer):
 
     @staticmethod
     async def check(url: str, headers: dict):
-        header = {"accept": "application/json", "Content-Type": "application/json"}
-
         async with aiohttp.ClientSession() as client:
-            response = await client.get(url, headers=headers.update(header))
+            response = await client.get(url, headers=headers)
         return response
 
 
@@ -66,11 +67,11 @@ security_jwt_verified = JWTBearer(check_user=True)
 def allowed_user(roles: List[Roles]):
     def decorator(user: Annotated[dict, Depends(security_jwt)]):
         if user["role"] == Roles.SUPERUSER:
-            return
+            return True
 
         if user["role"] not in roles:
             raise HTTPException(status_code=http.HTTPStatus.FORBIDDEN, detail="Insufficient permissions")
 
-        return
+        return True
 
     return decorator

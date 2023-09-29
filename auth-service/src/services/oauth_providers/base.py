@@ -1,6 +1,12 @@
+import enum
 from abc import ABC, abstractmethod
 
 from models.entity import User
+
+
+class OAuthProviders(enum.Enum):
+    yandex = "yandex"
+    google = "google"
 
 
 class OAuthBase(ABC):
