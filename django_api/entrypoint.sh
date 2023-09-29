@@ -17,7 +17,7 @@ wait_for_service() {
   echo "$host:$port is available."
 }
 
-wait_for_service postgres 5432
+wait_for_service "$POSTGRES_HOST" "$POSTGRES_PORT"
 
 python3 manage.py migrate --no-input
 

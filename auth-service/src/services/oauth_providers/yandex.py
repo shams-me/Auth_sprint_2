@@ -4,13 +4,15 @@ from core.config import settings
 from models.entity import SocialAccount, User
 from pylibs.yandexid import YandexID, YandexOAuth
 from pylibs.yandexid.schemas.yandexid import User as YandexUser
-from services.oauth_providers.base import OAuthBase
+from services.oauth_providers.base import OAuthBase, OAuthProviders
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from yandex_oauth import yao
 
 
 class YandexProvider(OAuthBase):
+    provider_name = OAuthProviders.yandex.value
+
     def __init__(self, postgres_session: AsyncSession = None) -> None:
         self.yandex_oauth = YandexOAuth(
             client_id=settings.YANDEX_CLIENT_ID,
@@ -29,7 +31,7 @@ class YandexProvider(OAuthBase):
 
         stmt = select(SocialAccount).where(
             SocialAccount.social_id == user_data.psuid,
-            SocialAccount.social_name == "yandex",
+            SocialAccount.social_name == self.provider_name,
         )
 
         account = await self.session.scalar(stmt)
@@ -47,7 +49,7 @@ class YandexProvider(OAuthBase):
             self.session.add(user)
             await self.session.commit()
 
-        social_account = SocialAccount(user_id=user.id, social_id=user_data.psuid, social_name="yandex")
+        social_account = SocialAccount(user_id=user.id, social_id=user_data.psuid, social_name=self.provider_name)
 
         self.session.add(social_account)
         return user

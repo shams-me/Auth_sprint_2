@@ -181,8 +181,7 @@ class AuthServiceImpl(AbstractAuthService):
             await self.session.commit()
 
             return SuccessfulAuth(access_token=access, refresh_token=refresh)
-        except Exception as e:
-            print(e)
+        except Exception:
             await self.session.rollback()
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

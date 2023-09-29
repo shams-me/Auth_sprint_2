@@ -13,14 +13,17 @@ class FilmWork(UUIDMixin, TimeStampedMixin):
         tv_show = "tv_show", _("Tv Show")
 
     title = models.TextField(_("title"))
-    description = models.TextField(_("description"), blank=True)
+    description = models.TextField(_("description"), blank=True, null=True)
     creation_date = models.DateField(_("creation date"), null=True, blank=True)
     rating = models.FloatField(
         _("rating"),
+        default=0,
+        null=True,
         blank=True,
         validators=[MinValueValidator(0), MaxValueValidator(100)],
     )
     type = models.CharField(_("type"), max_length=255, choices=Type.choices)
+    file_path = models.TextField(_("file path"), blank=True, null=True)
     film_genres = models.ManyToManyField(Genre, through="GenreFilmWork")
     persons = models.ManyToManyField(Person, through="PersonFilmWork")
 

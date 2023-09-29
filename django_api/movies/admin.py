@@ -24,7 +24,7 @@ class FilmWorkAdmin(admin.ModelAdmin):
 
     raw_id_fields = ["persons", "film_genres"]
 
-    list_display = ("title", "type", "creation_date", "rating", "created", "modified")
+    list_display = ("title", "type", "creation_date", "rating", "created_at", "updated_at")
     list_filter = ("type", "film_genres", "creation_date")
 
     search_fields = ("title",)

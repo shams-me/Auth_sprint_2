@@ -12,6 +12,16 @@ if ALLOWED_HOSTS := os.environ.get("ALLOWED_HOSTS"):
 else:
     ALLOWED_HOSTS = ["127.0.0.1", "localhost", "[::1]"]
 
+AUTH_SERVICE_HOST = os.environ.get("AUTH_SERVICE_HOST")
+AUTH_SERVICE_PORT = os.environ.get("AUTH_SERVICE_PORT")
+
+AUTH_USER_MODEL = "movies.User"
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "movies.auth.CustomBackend",
+]
+
 include(
     "components/database.py",
     "components/apps.py",

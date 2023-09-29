@@ -2,6 +2,7 @@ import logging
 import os
 import sqlite3
 from pathlib import Path
+from time import sleep
 
 from database_contexts import create_postgresql_connection, create_sqlite_connection
 from dotenv import load_dotenv
@@ -11,8 +12,21 @@ from psycopg2.extras import DictCursor
 from sqlite_extractor import SQLiteExtractor
 
 
+# Function to check if a table exists in PostgreSQL
+def table_exists(pg_conn, table_name):
+    cursor = pg_conn.cursor()
+    cursor.execute(f"SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = %s);", (table_name,))
+    result = cursor.fetchone()[0]
+    cursor.close()
+    return result
+
+
 def load_from_sqlite(sqlite_connection: sqlite3.Connection, postgres_connection: _connection):
     try:
+        while not table_exists(postgres_connection, "film_work"):
+            logging.info("Waiting for table existing!")
+            sleep(1)
+
         postgres_saver = PostgresSaver(postgres_connection)
         sqlite_extractor = SQLiteExtractor(sqlite_connection)
 

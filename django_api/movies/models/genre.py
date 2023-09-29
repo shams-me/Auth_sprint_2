@@ -6,7 +6,7 @@ from .mix_in import TimeStampedMixin, UUIDMixin
 
 class Genre(UUIDMixin, TimeStampedMixin):
     name = models.CharField(_("name"), max_length=255)
-    description = models.TextField(_("description"), blank=True)
+    description = models.TextField(_("description"), blank=True, null=True)
 
     class Meta:
         db_table = 'content"."genre'
